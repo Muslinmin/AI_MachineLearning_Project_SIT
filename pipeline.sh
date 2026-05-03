@@ -3,22 +3,23 @@
 # Prompt for model and experiment details at startup
 echo "=== Pipeline Configuration ==="
 read -p "Model name (e.g. random_forest): " model_name
+read -p "Search strategy (e.g. random_search, grid_search): " strategy
 read -p "Experiment number (e.g. 000001): " exp_number
 
 registry_file="model_config/model_registry.json"
-config_file="model_config/${model_name}/config_${model_name}_exp_${exp_number}.json"
+config_file="model_config/${model_name}/config_${strategy}_${model_name}_exp_${exp_number}.json"
 model_output="${model_name}_model.pkl"
-train_metrics_file="metrics/${model_name}/metrics_${model_name}_exp_${exp_number}_train.json"
-test_metrics_file="metrics/${model_name}/metrics_${model_name}_exp_${exp_number}_test.json"
+train_metrics_file="metrics/${model_name}/metrics_${strategy}_${model_name}_exp_${exp_number}_train.json"
+test_metrics_file="metrics/${model_name}/metrics_${strategy}_${model_name}_exp_${exp_number}_test.json"
 
 echo -e "\nRegistry : $registry_file"
 echo "Config   : $config_file"
 echo "Model    : $model_output"
-echo "Metrics  : metrics/${model_name}/metrics_${model_name}_exp_${exp_number}_[train|test].json"
+echo "Metrics  : metrics/${model_name}/metrics_${strategy}_${model_name}_exp_${exp_number}_[train|test].json"
 
 # Display the CLI menu
 while true; do
-    echo -e "\nPipeline CLI Menu (model: ${model_name} | exp: ${exp_number}):"
+    echo -e "\nPipeline CLI Menu (model: ${model_name} | strategy: ${strategy} | exp: ${exp_number}):"
     echo "1. Train the Model"
     echo "2. Test on Available Validation Dataset"
     echo "3. Test on New/Random Dataset"
@@ -52,11 +53,10 @@ while true; do
 
     elif [[ "$choice" == "3" ]]; then
         echo "Testing on all CSV files in the 'test CSV' directory..."
-        # Loop through all CSV files in the 'test CSV' directory
         for test_file in ./test\ CSV/*.csv; do
             echo "Processing file: $test_file"
             base_name=$(basename "${test_file%.csv}")
-            file_metrics="metrics/${model_name}/metrics_${model_name}_exp_${exp_number}_${base_name}_test.json"
+            file_metrics="metrics/${model_name}/metrics_${strategy}_${model_name}_exp_${exp_number}_${base_name}_test.json"
             python3 predict_model.py \
                 --test "$test_file" \
                 --model "$model_output" \

@@ -35,7 +35,7 @@ def resolve_params(config, registry):
 
     resolved_params = {
         **model_entry.get('default_params', {}),
-        **config.get('model_params', {})
+        **config.get('fixed_params', {})
     }
 
     seed_param = model_entry.get('seed_param', 'random_state')
@@ -125,6 +125,8 @@ def predict(test_data, model_path, config_file, registry_file, metrics_file):
     metrics = {
         "report_type": "test",
         "model_type": config['model_type'],
+        "search_strategy": config.get('search_strategy'),
+        "scoring": config.get('scoring'),
         "hyperparameters": resolved_params,
         "test": {
             "mse": round(float(mse), 6),
