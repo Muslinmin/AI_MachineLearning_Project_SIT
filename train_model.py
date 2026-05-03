@@ -7,7 +7,6 @@ import argparse
 import json
 import os
 import numpy as np
-import subprocess
 from preprocessing import preprocess_data
 
 
@@ -138,7 +137,7 @@ def extract_search_results(searcher):
     return results
 
 
-def train_model(train_data, model_output, config_file, registry_file, metrics_file):
+def train_model(train_data, model_output, config_file, registry_file, metrics_file, output_dir):
     data = pd.read_csv(train_data)
     X, y = preprocess_data(data)
 
@@ -179,9 +178,10 @@ def train_model(train_data, model_output, config_file, registry_file, metrics_fi
     training_report = classification_report(y_train, y_train_pred, target_names=target_names)
     validation_report = classification_report(y_val, y_val_pred, target_names=target_names)
 
-    with open("training_classification_report.txt", "w") as f:
+    os.makedirs(output_dir, exist_ok=True)
+    with open(os.path.join(output_dir, "training_classification_report.txt"), "w") as f:
         f.write(training_report)
-    with open("validation_classification_report.txt", "w") as f:
+    with open(os.path.join(output_dir, "validation_classification_report.txt"), "w") as f:
         f.write(validation_report)
 
     train_mse = mean_squared_error(y_train, y_train_pred)
@@ -229,9 +229,6 @@ def train_model(train_data, model_output, config_file, registry_file, metrics_fi
         json.dump(metrics, f, indent=2)
     print(f"Metrics saved to {metrics_file}")
 
-    # Generate PDF report
-    subprocess.run(["python3", "generate_pdf.py", "--report", "training_report.pdf", "--metrics", metrics_file])
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train a model via hyperparameter search.")
@@ -240,6 +237,7 @@ if __name__ == "__main__":
     parser.add_argument('--config', type=str, help="Path to the experiment configuration JSON file.")
     parser.add_argument('--registry', type=str, help="Path to the model registry JSON file.")
     parser.add_argument('--metrics', type=str, help="Path to save the metrics JSON file.")
+    parser.add_argument('--output_dir', type=str, help="Directory to save classification reports and text outputs.")
 
     args = parser.parse_args()
-    train_model(args.train, args.model_output, args.config, args.registry, args.metrics)
+    train_model(args.train, args.model_output, args.config, args.registry, args.metrics, args.output_dir)

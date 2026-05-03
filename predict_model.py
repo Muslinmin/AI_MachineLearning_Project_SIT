@@ -5,7 +5,6 @@ import argparse
 import json
 import os
 import numpy as np
-import subprocess
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill
 from preprocessing import preprocess_data
@@ -70,7 +69,7 @@ def apply_color_coding(excel_file):
     print(f"Color-coding applied and saved to {excel_file}")
 
 
-def predict(test_data, model_path, config_file, registry_file, metrics_file):
+def predict(test_data, model_path, config_file, registry_file, metrics_file, output_dir):
     # Load test data
     data = pd.read_csv(test_data)
     X, y = preprocess_data(data)
@@ -98,7 +97,8 @@ def predict(test_data, model_path, config_file, registry_file, metrics_file):
     # Generate output filenames dynamically
     base_filename = os.path.basename(test_data)
     file_name, _ = os.path.splitext(base_filename)
-    output_excel = f"{file_name}_prediction_output.xlsx"
+    os.makedirs('output/predicted_data', exist_ok=True)
+    output_excel = os.path.join('output/predicted_data', f"{file_name}_prediction_output.xlsx")
 
     data.to_excel(output_excel, index=False)
     print(f"Predictions saved to {output_excel}")
@@ -109,7 +109,8 @@ def predict(test_data, model_path, config_file, registry_file, metrics_file):
     test_report = classification_report(y, y_pred, target_names=target_names)
     print("Test set report:\n", test_report)
 
-    report_filename = f"{file_name}_classification_report.txt"
+    os.makedirs(output_dir, exist_ok=True)
+    report_filename = os.path.join(output_dir, f"{file_name}_classification_report.txt")
     with open(report_filename, "w") as f:
         f.write(test_report)
 
@@ -139,10 +140,6 @@ def predict(test_data, model_path, config_file, registry_file, metrics_file):
         json.dump(metrics, f, indent=2)
     print(f"Metrics saved to {metrics_file}")
 
-    # Call generate_pdf.py to create a PDF report
-    output_pdf = f"{file_name}_report.pdf"
-    subprocess.run(["python3", "generate_pdf.py", "--report", output_pdf, "--metrics", metrics_file])
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Predict using a trained model.")
@@ -151,6 +148,7 @@ if __name__ == "__main__":
     parser.add_argument('--config', type=str, help="Path to the experiment configuration JSON file.")
     parser.add_argument('--registry', type=str, help="Path to the model registry JSON file.")
     parser.add_argument('--metrics', type=str, help="Path to save the metrics JSON file.")
+    parser.add_argument('--output_dir', type=str, help="Directory to save reports and text outputs.")
 
     args = parser.parse_args()
-    predict(args.test, args.model, args.config, args.registry, args.metrics)
+    predict(args.test, args.model, args.config, args.registry, args.metrics, args.output_dir)
