@@ -6,5 +6,8 @@
 Claude.md
 Plan.md
 *.pkl
-
+*.ini
+*__pycache__/
+*metrics/
+*output/
 
