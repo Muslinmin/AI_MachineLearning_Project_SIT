@@ -187,7 +187,7 @@ pip install -r requirements.txt
 
 ## Contact
 
-For questions or feedback, feel free to reach out at [2201512@sit.singaporetech.edu.sg](mailto:lordmuze@gmail.com).
+For questions or feedback, feel free to reach out at [lordmuze@gmail.com](mailto:lordmuze@gmail.com).
 
 --- 
 
