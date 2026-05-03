@@ -1,0 +1,24 @@
+{
+  "default_seed": 42,
+  "models": {
+    "random_forest": {
+      "class": "sklearn.ensemble.RandomForestClassifier",
+      "seed_param": "random_state",
+      "default_params": {
+        "n_estimators": 100,
+        "max_depth": 8,
+        "min_samples_split": 2,
+        "min_samples_leaf": 1
+      }
+    },
+    "logistic_regression": {
+      "class": "sklearn.linear_model.LogisticRegression",
+      "seed_param": "random_state",
+      "default_params": {
+        "C": 1.0,
+        "max_iter": 1000,
+        "solver": "lbfgs"
+      }
+    }
+  }
+}

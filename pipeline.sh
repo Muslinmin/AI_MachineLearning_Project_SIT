@@ -5,12 +5,16 @@ echo "=== Pipeline Configuration ==="
 read -p "Model name (e.g. random_forest): " model_name
 read -p "Experiment number (e.g. 000001): " exp_number
 
+registry_file="model_config/model_registry.json"
 config_file="model_config/${model_name}/config_${model_name}_exp_${exp_number}.json"
+model_output="${model_name}_model.pkl"
 train_metrics_file="metrics/${model_name}/metrics_${model_name}_exp_${exp_number}_train.json"
 test_metrics_file="metrics/${model_name}/metrics_${model_name}_exp_${exp_number}_test.json"
 
-echo -e "\nConfig  : $config_file"
-echo "Metrics : metrics/${model_name}/metrics_${model_name}_exp_${exp_number}_[train|test].json"
+echo -e "\nRegistry : $registry_file"
+echo "Config   : $config_file"
+echo "Model    : $model_output"
+echo "Metrics  : metrics/${model_name}/metrics_${model_name}_exp_${exp_number}_[train|test].json"
 
 # Display the CLI menu
 while true; do
@@ -26,8 +30,9 @@ while true; do
         echo "Training the model..."
         python3 train_model.py \
             --train MS_1_Scenario_train.csv \
-            --model_output random_forest_model.pkl \
+            --model_output "$model_output" \
             --config "$config_file" \
+            --registry "$registry_file" \
             --metrics "$train_metrics_file"
         # Generate PDF report for training
         output_pdf="training_report.pdf"
@@ -37,8 +42,9 @@ while true; do
         echo "Testing on available validation dataset..."
         python3 predict_model.py \
             --test MS_1_Scenario_test.csv \
-            --model random_forest_model.pkl \
+            --model "$model_output" \
             --config "$config_file" \
+            --registry "$registry_file" \
             --metrics "$test_metrics_file"
         # Generate PDF report for validation test
         output_pdf="validation_test_report.pdf"
@@ -53,8 +59,9 @@ while true; do
             file_metrics="metrics/${model_name}/metrics_${model_name}_exp_${exp_number}_${base_name}_test.json"
             python3 predict_model.py \
                 --test "$test_file" \
-                --model random_forest_model.pkl \
+                --model "$model_output" \
                 --config "$config_file" \
+                --registry "$registry_file" \
                 --metrics "$file_metrics"
             # Generate PDF report for each test file
             output_pdf="${test_file%.csv}_report.pdf"
