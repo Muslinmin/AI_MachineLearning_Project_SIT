@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, mean_squared_error, mean_absolute_error
 import joblib
 import argparse
-from configparser import ConfigParser
+import json
 import numpy as np
 import subprocess
 from preprocessing import preprocess_data
@@ -13,17 +13,17 @@ def train_model(train_data, model_output, config_file):
     data = pd.read_csv(train_data)
     X, y = preprocess_data(data)
 
-    config = ConfigParser()
-    config.read(config_file)
-    model_params = config['MODEL_PARAMS']
-    
+    with open(config_file) as f:
+        config = json.load(f)
+    model_params = config['model_params']
+
     # Set model parameters from config file
     model = RandomForestClassifier(
-        n_estimators=int(model_params.get('n_estimators', 100)),
-        max_depth=int(model_params.get('max_depth', None)),
-        min_samples_split=int(model_params.get('min_samples_split', 2)),
-        min_samples_leaf=int(model_params.get('min_samples_leaf', 1)),
-        random_state=int(model_params.get('random_state', 42))
+        n_estimators=model_params.get('n_estimators', 100),
+        max_depth=model_params.get('max_depth', None),
+        min_samples_split=model_params.get('min_samples_split', 2),
+        min_samples_leaf=model_params.get('min_samples_leaf', 1),
+        random_state=model_params.get('random_state', 42)
     )
 
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)

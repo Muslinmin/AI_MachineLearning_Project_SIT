@@ -13,7 +13,7 @@ while true; do
     if [[ "$choice" == "1" ]]; then
         echo "Training the model..."
         # Train the model
-        python3 train_model.py --train MS_1_Scenario_train.csv --model_output random_forest_model.pkl --config config.txt
+        python3 train_model.py --train MS_1_Scenario_train.csv --model_output random_forest_model.pkl --config model_config/random_forest/config_random_forest_exp_000001.json
         # Generate PDF report for training
         output_pdf="training_report.pdf"
         python3 generate_pdf.py --report "$output_pdf" --type "training"
